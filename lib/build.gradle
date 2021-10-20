@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType(Test) {
+    systemProperty 'java.library.path', 'build\\shared'
+}
+
 dependencies {
     // Use JUnit test framework.
     testImplementation 'junit:junit:4.13.2'
