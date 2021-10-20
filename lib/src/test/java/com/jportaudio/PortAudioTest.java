@@ -7,8 +7,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PortAudioTest {
-    @Test public void someLibraryMethodReturnsTrue() {
-        PortAudio classUnderTest = new PortAudio();
-        assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
+    @Test public void testInitPortAudio() {
+        try {
+            PortAudio.init();
+            PortAudio.terminate();
+        } catch (RuntimeException e) {
+            System.out.println(e);
+            fail();
+        }
     }
 }
