@@ -8,6 +8,7 @@ package com.jportaudio;
 
 public class PortAudio {
     static {
+        System.loadLibrary("portaudio");
         System.loadLibrary("jportaudio");
     }
     public static native int getVersion();

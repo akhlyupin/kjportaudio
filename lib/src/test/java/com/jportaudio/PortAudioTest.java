@@ -10,6 +10,10 @@ public class PortAudioTest {
     @Test public void testInitPortAudio() {
         try {
             PortAudio.init();
+
+            System.out.println(PortAudio.getVersionText());
+            System.out.println(PortAudio.getVersionControlRevision());
+
             PortAudio.terminate();
         } catch (RuntimeException e) {
             System.out.println(e);
