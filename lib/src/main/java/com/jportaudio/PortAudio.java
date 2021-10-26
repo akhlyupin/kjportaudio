@@ -37,19 +37,6 @@ public class PortAudio {
     public native HostApi  getHostApi(int index) throws RuntimeException;
     public native HostApi  getDefaultHostApi() throws RuntimeException;
 
-    /*private HostApi[] hostApi;
-    private int hostApiDefaultIndex;
-
-    public int getHostApiLength() {
-        return hostApi.length;
-    }
-    public HostApi getHostApi(int index) {
-        return hostApi[index];
-    }
-    public HostApi getDefaultHostApi() {
-        return hostApi[hostApiDefaultIndex];
-    }*/
-
     /* Device */
     /*private Device[] device;
     public int getDeviceCount() {

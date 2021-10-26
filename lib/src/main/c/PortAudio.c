@@ -7,25 +7,7 @@
 #include "com_jportaudio_PortAudio.h"
 #include "portaudio.h"
 #include "JniUtils.h"
-
-static jint checkError(JNIEnv *env, PaError err) {
-    if( err == -1 ) {
-        return JNI_ThrowError( env, "-1, possibly no available default device" );
-
-    } else if( err < 0 ) {
-
-        if( err == paUnanticipatedHostError ) {
-            const PaHostErrorInfo *hostErrorInfo = Pa_GetLastHostErrorInfo();
-            return JNI_ThrowError( env, hostErrorInfo->errorText );
-
-        } else {
-            return JNI_ThrowError( env, Pa_GetErrorText( err ) );
-        }
-
-    } else {
-        return err;
-    }
-}
+#include "JpaUtils.h"
 
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_getVersion(JNIEnv * env, jclass c) {
@@ -50,20 +32,20 @@ Java_com_jportaudio_PortAudio_getErrorText(JNIEnv * env, jclass c, jint errorCod
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_init(JNIEnv * env, jclass c) {
     PaError err = Pa_Initialize();
-    return checkError( env, err );
+    return JPA_CheckError( env, err );
 }
 
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_terminate(JNIEnv * env , jclass c) {
     PaError err = Pa_Terminate();
-    return checkError( env, err );
+    return JPA_CheckError( env, err );
 }
 
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_getSampleSize(JNIEnv * env, jclass c, jobject sampleFormat) {
     jint format = JNI_GetIntField( env, sampleFormat, "value" );
     PaError err = Pa_GetSampleSize( format );
-    return checkError( env, err );
+    return JPA_CheckError( env, err );
 }
 
 JNIEXPORT void JNICALL
@@ -74,7 +56,7 @@ Java_com_jportaudio_PortAudio_sleep(JNIEnv * env, jclass c, jlong ms) {
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_getHostApiCount(JNIEnv * env, jobject o) {
     PaError err = Pa_GetHostApiCount();
-    return checkError( env, err );
+    return JPA_CheckError( env, err );
 }
 
 JNIEXPORT jobject JNICALL
@@ -130,6 +112,6 @@ Java_com_jportaudio_PortAudio_getDefaultHostApi(JNIEnv * env, jobject o) {
         return Java_com_jportaudio_PortAudio_getHostApi(env, o, err); 
     }
 
-    checkError( env, err );
+    JPA_CheckError( env, err );
     return NULL;
 }
