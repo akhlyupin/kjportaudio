@@ -40,12 +40,10 @@ public class HostApi {
     public int getDeviceCount() {
         return deviceCount;
     }
-    public int getDefaultInputDevice() {
-        return defaultInputDevice;
-    }
-    public int getDefaultOutputDevice() {
-        return defaultOutputDevice;
-    }
+
+    public native Device getDevice(int index) throws RuntimeException;
+    public native Device getDefaultInputDevice() throws RuntimeException;
+    public native Device getDefaultOutputDevice() throws RuntimeException;
 
     @Override
     public String toString() {
