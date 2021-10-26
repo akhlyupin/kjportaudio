@@ -7,10 +7,17 @@
 package com.jportaudio;
 
 public class PortAudio {
+    public static PortAudio instance = new PortAudio();
+
     static {
         System.loadLibrary("portaudio");
         System.loadLibrary("jportaudio");
     }
+
+    private PortAudio() {
+        update();
+    }
+
     public static native int getVersion();
     public static native String getVersionText();
     public static native String getVersionControlRevision();
@@ -24,4 +31,42 @@ public class PortAudio {
     public static native int getSampleSize(SampleFormat format)
             throws RuntimeException;
     public static native void sleep(long msec);
+
+    /* Host Api */
+    public native int      getHostApiCount() throws RuntimeException;
+    public native HostApi  getHostApi(int index) throws RuntimeException;
+    public native HostApi  getDefaultHostApi() throws RuntimeException;
+
+    /*private HostApi[] hostApi;
+    private int hostApiDefaultIndex;
+
+    public int getHostApiLength() {
+        return hostApi.length;
+    }
+    public HostApi getHostApi(int index) {
+        return hostApi[index];
+    }
+    public HostApi getDefaultHostApi() {
+        return hostApi[hostApiDefaultIndex];
+    }*/
+
+    /* Device */
+    /*private Device[] device;
+    public int getDeviceCount() {
+        return device.length;
+    }
+    public Device getDevice(int index) {
+        return device[index];
+    }
+    public Device getDefaultInputDevice() {
+        return null;
+    }
+    public Device getDefaultOutputDevice() {
+        return null;
+    }*/
+
+    /* update hostApi and device objects */
+    public void update() {
+
+    }
 }

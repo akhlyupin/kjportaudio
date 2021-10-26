@@ -70,3 +70,66 @@ JNIEXPORT void JNICALL
 Java_com_jportaudio_PortAudio_sleep(JNIEnv * env, jclass c, jlong ms) {
     Pa_Sleep(ms);
 }
+
+JNIEXPORT jint JNICALL
+Java_com_jportaudio_PortAudio_getHostApiCount(JNIEnv * env, jobject o) {
+    PaError err = Pa_GetHostApiCount();
+    return checkError( env, err );
+}
+
+JNIEXPORT jobject JNICALL
+Java_com_jportaudio_PortAudio_getHostApi(JNIEnv * env, jobject o, jint index) {
+    const PaHostApiInfo * hostApi = Pa_GetHostApiInfo(index);
+    if (hostApi == NULL) {
+        JNI_ThrowError( env, "Get HostApiInfo error.\n");
+        return NULL;
+    }
+
+    jclass hostApiClass = (*env)->FindClass(env, "com/jportaudio/HostApi");
+    if (hostApiClass == NULL) {
+        (*env)->DeleteLocalRef(env, hostApiClass);
+        JNI_ThrowError( env, "HostApi class found error.\n");
+        return NULL;
+    }
+
+    jmethodID constructorHostApi = (*env)->GetMethodID(
+        env, hostApiClass, "<init>", "(IILjava/lang/String;III)V"); 
+    if (constructorHostApi == NULL) {
+        (*env)->DeleteLocalRef(env, hostApiClass);
+        JNI_ThrowError( env, "HostApi constructor found error.\n");
+        return NULL;
+    }
+
+    jstring name = (*env)->NewStringUTF(env, hostApi->name);
+    if (name == NULL) {
+        (*env)->DeleteLocalRef(env, hostApiClass);
+        (*env)->DeleteLocalRef(env, name);
+        JNI_ThrowError( env, "HostApi name found error.\n");
+        return NULL;
+    }
+
+    jobject hostApiObj = (*env)->NewObject(
+        env, hostApiClass, constructorHostApi, 
+        index, hostApi->type, name,
+        hostApi->deviceCount, hostApi->defaultInputDevice, hostApi->defaultOutputDevice);
+    if (hostApiObj == NULL) {
+        (*env)->DeleteLocalRef(env, hostApiClass);
+        (*env)->DeleteLocalRef(env, name);
+        (*env)->DeleteLocalRef(env, hostApiObj);
+        JNI_ThrowError( env, "HostApi object create error.\n");
+        return NULL;
+    }
+
+    return hostApiObj;
+}
+
+JNIEXPORT jobject JNICALL 
+Java_com_jportaudio_PortAudio_getDefaultHostApi(JNIEnv * env, jobject o) {
+    PaError err = Pa_GetDefaultHostApi();
+    if (err >= 0) {
+        return Java_com_jportaudio_PortAudio_getHostApi(env, o, err); 
+    }
+
+    checkError( env, err );
+    return NULL;
+}

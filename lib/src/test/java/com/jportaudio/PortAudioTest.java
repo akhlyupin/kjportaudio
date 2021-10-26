@@ -4,6 +4,7 @@
 package com.jportaudio;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class PortAudioTest {
@@ -13,6 +14,29 @@ public class PortAudioTest {
 
             System.out.println(PortAudio.getVersionText());
             System.out.println(PortAudio.getVersionControlRevision());
+
+            PortAudio.terminate();
+        } catch (RuntimeException e) {
+            System.out.println(e);
+            fail();
+        }
+    }
+
+    @Test public void testHostApi() {
+        try {
+            PortAudio.init();
+            PortAudio pa = PortAudio.instance;
+
+
+            for (int i = 0; i < pa.getHostApiCount(); i++) {
+                HostApi ha = pa.getHostApi(i);
+                System.out.println(ha.toString());
+                System.out.println("defaultInput=" + ha.getDefaultInputDevice() +
+                        " defaultOutput=" + ha.getDefaultOutputDevice());
+            }
+
+            System.out.println("Default Host Api:");
+            System.out.println(pa.getDefaultHostApi().toString());
 
             PortAudio.terminate();
         } catch (RuntimeException e) {

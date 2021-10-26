@@ -71,6 +71,30 @@ JNIEXPORT jint JNICALL Java_com_jportaudio_PortAudio_getSampleSize
 JNIEXPORT void JNICALL Java_com_jportaudio_PortAudio_sleep
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getHostApiCount
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_jportaudio_PortAudio_getHostApiCount
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getHostApi
+ * Signature: (I)Lcom/jportaudio/HostApi;
+ */
+JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getHostApi
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getDefaultHostApi
+ * Signature: ()Lcom/jportaudio/HostApi;
+ */
+JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDefaultHostApi
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif
