@@ -20,6 +20,8 @@ extern jdouble JNI_GetDoubleField( JNIEnv *env, jobject obj, const char *fieldNa
 
 extern void JNI_SetStringField( JNIEnv *env, jobject obj, const char *fieldName, const char *value );
 
+extern jobject JNI_GetObjectField( JNIEnv *env, jobject obj, const char *fieldName, const char * sig );
+
 extern jint JNI_ThrowError( JNIEnv *env, const char *message );
 
 #endif /* JNI_UTILS_H */

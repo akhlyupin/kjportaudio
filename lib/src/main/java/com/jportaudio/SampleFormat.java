@@ -16,10 +16,14 @@ public enum SampleFormat {
     CustomFormat(0x00010000),
     NonInterleaved(0x80000000);
 
-    private final int value;
+    private final long value;
 
-    private SampleFormat(int value) {
+    private SampleFormat(long value) {
         this.value = value;
+    }
+
+    public long getValue() {
+        return value;
     }
 
 }

@@ -7,7 +7,7 @@
 package com.jportaudio;
 
 public class Device {
-    private final int       index;
+    final int               index;
     private final String    name;
     private final int       hostApiIndex;
 

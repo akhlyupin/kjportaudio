@@ -8,7 +8,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class PortAudioTest {
-    @Test public void testInitPortAudio() {
+    @Test
+    public void testInitPortAudio() {
         try {
             PortAudio.init();
 

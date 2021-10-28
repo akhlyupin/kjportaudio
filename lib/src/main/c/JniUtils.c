@@ -123,6 +123,24 @@ void JNI_SetStringField( JNIEnv *env, jobject obj, const char *fieldName, const 
      }
 }
 
+jobject JNI_GetObjectField( JNIEnv *env, jobject obj, const char *fieldName, const char *sig ) {
+    jclass c = (*env)->GetObjectClass(env, obj);
+    if (c == NULL) {
+        JNI_ThrowError( env, "Cannot find object JNI field. GetObjectClass error." );
+        return NULL;
+    }
+
+    jfieldID fid = (*env)->GetFieldID(env, c, fieldName, sig);
+    if (fid == NULL) {
+        JNI_ThrowError( env, "Cannot find object JNI field." );
+        return NULL;
+    } else {
+        return (*env)->GetObjectField(env, obj, fid );
+    }
+}
+
+
+
 jint JNI_ThrowError( JNIEnv *env, const char *message ) {
     return (*env)->ThrowNew(env,
                             (*env)->FindClass( env, "java/lang/RuntimeException"),
