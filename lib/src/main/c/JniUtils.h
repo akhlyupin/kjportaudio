@@ -22,6 +22,11 @@ extern void JNI_SetStringField( JNIEnv *env, jobject obj, const char *fieldName,
 
 extern jobject JNI_GetObjectField( JNIEnv *env, jobject obj, const char *fieldName, const char * sig );
 
+extern jbyteArray JNI_GetJByteArray(JNIEnv * env, const jbyte * bytes, jsize length);
+extern void JNI_GetBytes(JNIEnv * env, jbyteArray arr, jbyte ** bytes, jsize * length);
+
+extern jmethodID JNI_GetObjectMethod(JNIEnv *env, jobject obj, const char *name, const char *sig);
+
 extern jint JNI_ThrowError( JNIEnv *env, const char *message );
 
 #endif /* JNI_UTILS_H */

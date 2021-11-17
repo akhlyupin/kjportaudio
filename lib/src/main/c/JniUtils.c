@@ -139,6 +139,41 @@ jobject JNI_GetObjectField( JNIEnv *env, jobject obj, const char *fieldName, con
     }
 }
 
+jbyteArray JNI_GetJByteArray(JNIEnv * env, const jbyte * bytes, jsize length) {
+    jbyteArray byteArray = (*env)->NewByteArray(env, length);
+    (*env)->SetByteArrayRegion(env, byteArray, 0, length, (jbyte *)bytes);
+    return byteArray;
+}
+
+void JNI_GetBytes(JNIEnv * env, jbyteArray arr, jbyte ** bytes, jsize * length) {
+    *length = 0;
+    *bytes = NULL;
+
+    if (arr) {
+        *length = (*env)->GetArrayLength(env, arr);
+
+        if (*length > 0) {
+            *bytes = (*env)->GetByteArrayElements(env, arr, NULL);
+        }
+    }
+}
+
+jmethodID JNI_GetObjectMethod(JNIEnv *env, jobject obj, const char *name, const char *sig) {
+    jclass c = (*env)->GetObjectClass(env, obj);
+    if (c == NULL) {
+        JNI_ThrowError( env, "Cannot find object JNI method. GetObjectClass error." );
+        return NULL;
+    }
+
+    jmethodID mid = (*env)->GetMethodID(env, c, name, sig);
+    if (mid == NULL) {
+        JNI_ThrowError( env, "Cannot find object JNI method." );
+        return NULL;
+    } else {
+        return mid;
+    }
+}
+
 
 
 jint JNI_ThrowError( JNIEnv *env, const char *message ) {
