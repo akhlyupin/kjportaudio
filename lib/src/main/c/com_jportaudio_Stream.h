@@ -18,10 +18,10 @@ JNIEXPORT jboolean JNICALL Java_com_jportaudio_Stream_isFormatSupported
 /*
  * Class:     com_jportaudio_Stream
  * Method:    open
- * Signature: (JLcom/jportaudio/Stream/Flags;Lcom/jportaudio/Stream/Listener;Ljava/nio/ByteBuffer;)V
+ * Signature: (JLcom/jportaudio/Stream/Flags;Lcom/jportaudio/Stream/Listener;[B)V
  */
 JNIEXPORT void JNICALL Java_com_jportaudio_Stream_open
-  (JNIEnv *, jobject, jlong, jobject, jobject, jobject);
+  (JNIEnv *, jobject, jlong, jobject, jobject, jbyteArray);
 
 /*
  * Class:     com_jportaudio_Stream

@@ -97,12 +97,12 @@ public class Stream {
 
     interface Listener {
         int onProcess(
-                ByteBuffer input,
-                ByteBuffer output,
+                byte[] input,
+                byte[] output,
                 long frameCount,
                 Stream.CallbackTimeInfo timeInfo,
                 Stream.CallbackFlags statusFlags,
-                ByteBuffer userData );
+                byte[] userData );
         int onFinished();
     }
 
@@ -110,7 +110,7 @@ public class Stream {
             long framesPerBuffer,
             Stream.Flags flags,
             Listener listener,
-            ByteBuffer userData) throws RuntimeException;
+            byte[] userData) throws RuntimeException;
 
     public native void close() throws RuntimeException;
     public native void start() throws RuntimeException;

@@ -8,6 +8,9 @@
 #include "portaudio.h"
 #include "JniUtils.h"
 #include "JpaUtils.h"
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
 static void getStreamParam(
     JNIEnv * env, jobject streamParam, PaStreamParameters * paStreamParam) {
@@ -55,14 +58,99 @@ Java_com_jportaudio_Stream_isFormatSupported(
     return JPA_CheckError(env, err);
 }
 
+typedef struct {
+    jobject listener;
+    unsigned int length;
+} CallbackUserData_t;
+
+static JavaVM * javaVM = NULL;
+
+static int streamCallback( const void *input, void *output, 
+                    unsigned long frameCount,
+                    const PaStreamCallbackTimeInfo* timeInfo,
+                    PaStreamCallbackFlags statusFlags,
+                    void *userData ) {
+
+    CallbackUserData_t * cbUserData = (CallbackUserData_t *)userData;
+    if (cbUserData->listener == NULL) {
+        return paAbort;
+    }
+
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_8;
+    args.name = "AudioStreamCallbackThread";
+    args.group = NULL;
+ 
+    JNIEnv * env = NULL;
+
+    if ((*javaVM)->AttachCurrentThread(javaVM, (void**)&env, &args) != JNI_OK) {
+        JNI_ThrowError( env, "Attach audio stream thread error." );
+        return paAbort;
+    }
+
+    if (env == NULL) {
+        (*javaVM)->DetachCurrentThread(javaVM);
+        JNI_ThrowError( env, "Get jni environment in stream thread error." );
+        return paAbort;
+    }
+
+    jmethodID onProcMethod = JNI_GetObjectMethod(env, cbUserData->listener, "onProcess", 
+            "([B[BJLcom/jportaudio/Stream$CallbackTimeInfo;Lcom/jportaudio/Stream$CallbackFlags;[B)I");
+
+    if (onProcMethod == NULL) {
+        (*javaVM)->DetachCurrentThread(javaVM);
+        JNI_ThrowError( env, "Cannot find onProcMethod." );
+        return paAbort;
+    }
+
+    jbyteArray jUserData = NULL;
+    if (cbUserData->length > 0) {
+        jUserData = JNI_GetJByteArray(env, userData + sizeof(CallbackUserData_t), cbUserData->length);
+    }
+    
+    
+    //TODO: frameCount need multiply to SampleFormat. now it is fixed *4 for paFloatFormat
+    jint result = (*env)->CallIntMethod(
+        env, cbUserData->listener, onProcMethod, 
+        JNI_GetJByteArray(env, input, frameCount * 4), NULL, (jlong)frameCount, NULL, NULL, jUserData);
+
+    (*javaVM)->DetachCurrentThread(javaVM);
+
+    return result;
+    
+}
+
+static CallbackUserData_t * getUserData(JNIEnv * env, jobject listener, jbyteArray jUserData) {
+    if (listener == NULL) return NULL;
+
+    jsize jUserDataLength = 0;
+    jbyte * ud = NULL;
+    JNI_GetBytes(env, jUserData, &ud, &jUserDataLength);
+
+    /* make and fill CallbackUserData structure */
+    uint8_t * cbUserData = malloc(sizeof(CallbackUserData_t) + jUserDataLength);
+    CallbackUserData_t * header = (CallbackUserData_t *)cbUserData;
+    header->listener = (*env)->NewGlobalRef(env, listener);
+    header->length = jUserDataLength;
+
+    if (jUserDataLength > 0) {
+        memcpy(cbUserData + sizeof(CallbackUserData_t), ud, jUserDataLength);
+        (*env)->ReleaseByteArrayElements(env, jUserData, ud, 0);
+    }
+
+    return header;    
+}
 
 JNIEXPORT void JNICALL 
 Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o, 
-    jlong framesPerBuffer, jobject flags, jobject listener, jobject userData) {
+    jlong framesPerBuffer, jobject flags, jobject listener, jbyteArray jUserData) {
     
-    /* get stream pointer*/
-    PaStream * paStream;
-
+    /* get JavaVM */
+    if ((*env)->GetJavaVM(env, &javaVM) != JNI_OK) {
+        JNI_ThrowError( env, "Cannot get JavaVM." );
+        return;
+    }
+    
     /* get input&output stream params*/
     jobject inputParam = 
         JNI_GetObjectField(env, o, "inputParameters", "Lcom/jportaudio/Stream$Parameters;");
@@ -88,15 +176,18 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
 
     /* get stream flags */
     PaStreamFlags paFlags = JNI_GetIntField(env, flags, "value");
-
+        
+    /* open stream */
+    PaStream * paStream;
     PaError err = Pa_OpenStream(    &paStream,
                                     paInputParamPointer,
                                     paOutputParamPointer,
                                     sampleRate,
                                     framesPerBuffer,
                                     paFlags,
-                                    NULL, //PaStreamCallback *streamCallback,
-                                    NULL);
+                                    (listener) ? streamCallback : NULL, 
+                                    getUserData(env, listener, jUserData));
+
     JNI_SetLongField(env, o, "nativeStream", (jlong)paStream);
 
     JPA_CheckError(env, err);
