@@ -74,9 +74,9 @@ public class StreamCallbackTest {
             System.out.println(outputDevice.toString());
 
             Stream.Parameters inputParams = new Stream.Parameters(
-                    inputDevice, 1, SampleFormat.Float32, 0);
+                    inputDevice, 1, SampleFormat.Float32, 0, null);
             Stream.Parameters outputParams = new Stream.Parameters(
-                    outputDevice, 1, SampleFormat.Float32, 0);
+                    outputDevice, 1, SampleFormat.Float32, 0, null);
             Stream stream = new Stream(inputParams, outputParams, 44100.0);
 
             byte[] userData = new byte[]{0,1,2,3,4,5,6,7};

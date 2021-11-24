@@ -34,13 +34,14 @@ public class Stream {
         public Parameters(Device device,
                           int channelCount,
                           SampleFormat sampleFormat,
-                          double suggestedLatency) {
+                          double suggestedLatency,
+                          byte[] hostApiSpecificStreamInfo) {
 
             this.deviceIndex = device.index;
             this.channelCount = channelCount;
             this.sampleFormat = sampleFormat.getValue();
             this.suggestedLatency = suggestedLatency;
-            this.hostApiSpecificStreamInfo = null;
+            this.hostApiSpecificStreamInfo = hostApiSpecificStreamInfo;
         }
     };
 
