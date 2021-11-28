@@ -20,9 +20,29 @@ static void getStreamParam(
         paStreamParam->channelCount = JNI_GetIntField(env, streamParam, "channelCount");
         paStreamParam->sampleFormat = JNI_GetLongField(env, streamParam, "sampleFormat");
         paStreamParam->suggestedLatency = JNI_GetDoubleField(env, streamParam, "suggestedLatency");
-        //TODO: implement get hostApiSpecificStreamInfo
-        //paInputParams.hostApiSpecificStreamInfo = JNI_GetIntField(env, streamParam, "hostApiSpecificStreamInfo");
         paStreamParam->hostApiSpecificStreamInfo = NULL;
+
+        jbyteArray specificStreamInfoArray = 
+            JNI_GetObjectField( env, streamParam, "hostApiSpecificStreamInfo", "[B" );
+
+        if (specificStreamInfoArray) {
+            jbyte * specificStreamInfo;
+            jsize specificStreamInfoLength;
+            
+            JNI_GetBytes(env, specificStreamInfoArray, &specificStreamInfo, &specificStreamInfoLength);
+            paStreamParam->hostApiSpecificStreamInfo = specificStreamInfo;
+
+            printf("specificStreamInfoArray :\n");
+            for (int i = 0; i < specificStreamInfoLength; i+=4) {
+                jbyte * b = specificStreamInfo;
+                printf("%d %d %d %d\n", b[i], b[i+1], b[i+2], b[i+3]);
+            }
+            printf("specificStreamInfoArray END\n");
+
+        } else {
+            printf("specificStreamInfoArray == NULL\n");
+        }
+        
     }
 
 }
