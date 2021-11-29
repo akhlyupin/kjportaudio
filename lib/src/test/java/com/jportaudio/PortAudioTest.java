@@ -26,18 +26,16 @@ public class PortAudioTest {
     @Test public void testHostApi() {
         try {
             PortAudio.init();
-            PortAudio pa = PortAudio.instance;
 
-
-            for (int i = 0; i < pa.getHostApiCount(); i++) {
-                HostApi ha = pa.getHostApi(i);
+            for (int i = 0; i < PortAudio.getHostApiCount(); i++) {
+                HostApi ha = PortAudio.getHostApi(i);
                 System.out.println(ha.toString());
                 System.out.println("defaultInput=" + ha.getDefaultInputDevice() +
                         " defaultOutput=" + ha.getDefaultOutputDevice());
             }
 
             System.out.println("Default Host Api:");
-            System.out.println(pa.getDefaultHostApi().toString());
+            System.out.println(PortAudio.getDefaultHostApi().toString());
 
             PortAudio.terminate();
         } catch (RuntimeException e) {

@@ -68,8 +68,8 @@ public class StreamCallbackTest {
     public void testStreamRead() {
         try {
             PortAudio.init();
-            Device inputDevice = PortAudio.instance.getDefaultHostApi().getDefaultInputDevice();
-            Device outputDevice = PortAudio.instance.getDefaultHostApi().getDefaultOutputDevice();
+            Device inputDevice = PortAudio.getDefaultHostApi().getDefaultInputDevice();
+            Device outputDevice = PortAudio.getDefaultHostApi().getDefaultOutputDevice();
             System.out.println(inputDevice.toString());
             System.out.println(outputDevice.toString());
 

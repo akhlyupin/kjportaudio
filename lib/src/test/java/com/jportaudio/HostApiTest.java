@@ -15,10 +15,9 @@ public class HostApiTest {
     public void testHostApi() {
         try {
             PortAudio.init();
-            PortAudio pa = PortAudio.instance;
 
-            for (int i = 0; i < pa.getHostApiCount(); i++) {
-                HostApi hostApi = pa.getHostApi(i);
+            for (int i = 0; i < PortAudio.getHostApiCount(); i++) {
+                HostApi hostApi = PortAudio.getHostApi(i);
                 System.out.println("HostApi[" + i + "]:" + hostApi.toString());
 
                 for (int u = 0; u < hostApi.getDeviceCount(); u++) {

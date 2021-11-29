@@ -76,11 +76,9 @@ public class PaWasapiStreamInfoTest {
     };
 
     private Device getWasapiInput() throws RuntimeException {
-        PortAudio pa = PortAudio.instance;
-
-        for (int i = 0; i < pa.getHostApiCount(); i++) {
-            if (pa.getHostApi(i).getType() == HostApi.TypeId.WASAPI) {
-                return pa.getHostApi(i).getDefaultInputDevice();
+        for (int i = 0; i < PortAudio.getHostApiCount(); i++) {
+            if (PortAudio.getHostApi(i).getType() == HostApi.TypeId.WASAPI) {
+                return PortAudio.getHostApi(i).getDefaultInputDevice();
             }
         }
         return null;

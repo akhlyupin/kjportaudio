@@ -12,9 +12,8 @@ public class StreamTest {
     public void testConstruction() {
         try {
             PortAudio.init();
-            PortAudio pa = PortAudio.instance;
 
-            Device inputDevice = pa.getDefaultHostApi().getDefaultInputDevice();
+            Device inputDevice = PortAudio.getDefaultHostApi().getDefaultInputDevice();
             System.out.println(inputDevice.toString());
 
             Stream.Parameters params = new Stream.Parameters(
@@ -31,11 +30,10 @@ public class StreamTest {
     }
 
     private Device getWasapiInput() throws RuntimeException {
-        PortAudio pa = PortAudio.instance;
 
-        for (int i = 0; i < pa.getHostApiCount(); i++) {
-            if (pa.getHostApi(i).getType() == HostApi.TypeId.WASAPI) {
-                return pa.getHostApi(i).getDefaultInputDevice();
+        for (int i = 0; i < PortAudio.getHostApiCount(); i++) {
+            if (PortAudio.getHostApi(i).getType() == HostApi.TypeId.WASAPI) {
+                return PortAudio.getHostApi(i).getDefaultInputDevice();
             }
         }
         return null;
@@ -74,8 +72,8 @@ public class StreamTest {
     public void testBlockingStreamWrite() {
         try {
             PortAudio.init();
-            Device inputDevice = PortAudio.instance.getDefaultHostApi().getDefaultInputDevice();
-            Device outputDevice = PortAudio.instance.getDefaultHostApi().getDefaultOutputDevice();
+            Device inputDevice = PortAudio.getDefaultHostApi().getDefaultInputDevice();
+            Device outputDevice = PortAudio.getDefaultHostApi().getDefaultOutputDevice();
             System.out.println(inputDevice.toString());
             System.out.println(outputDevice.toString());
 
@@ -128,8 +126,8 @@ public class StreamTest {
     public void testBlockingStreamRead() {
         try {
             PortAudio.init();
-            Device inputDevice = PortAudio.instance.getDefaultHostApi().getDefaultInputDevice();
-            Device outputDevice = PortAudio.instance.getDefaultHostApi().getDefaultOutputDevice();
+            Device inputDevice = PortAudio.getDefaultHostApi().getDefaultInputDevice();
+            Device outputDevice = PortAudio.getDefaultHostApi().getDefaultOutputDevice();
             System.out.println(inputDevice.toString());
 
             Stream.Parameters inputParams = new Stream.Parameters(
