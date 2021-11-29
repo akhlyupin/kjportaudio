@@ -18,6 +18,8 @@ public class PortAudio {
         update();
     }
 
+    public static native String getJPAVersionText();
+
     public static native int getVersion();
     public static native String getVersionText();
     public static native String getVersionControlRevision();

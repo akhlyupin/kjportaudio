@@ -8,6 +8,12 @@
 #include "portaudio.h"
 #include "JniUtils.h"
 #include "JpaUtils.h"
+#include "Device.h"
+
+JNIEXPORT jstring JNICALL 
+Java_com_jportaudio_PortAudio_getJPAVersionText(JNIEnv * env, jclass c) {
+    return (*env)->NewStringUTF(env, "0.1.0" );
+}
 
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_getVersion(JNIEnv * env, jclass c) {

@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     com_jportaudio_PortAudio
+ * Method:    getJPAVersionText
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_jportaudio_PortAudio_getJPAVersionText
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_jportaudio_PortAudio
  * Method:    getVersion
  * Signature: ()I
  */
