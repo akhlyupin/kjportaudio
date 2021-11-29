@@ -48,7 +48,7 @@ public class Stream {
     private native boolean isFormatSupported(
             Parameters input, Parameters output, double sampleRate) throws RuntimeException;
 
-    enum Flags {
+    public enum Flags {
         NoFlag(0),
         ClipOff(0x00000001),
         DitherOff(0x00000002),
@@ -64,13 +64,13 @@ public class Stream {
 
     };
 
-    static class CallbackTimeInfo {
+    public static class CallbackTimeInfo {
         double inputBufferAdcTime;  /**< The time when the first sample of the input buffer was captured at the ADC input */
         double currentTime;         /**< The time when the stream callback was invoked */
         double outputBufferDacTime; /**< The time when the first sample of the output buffer will output the DAC */
     };
 
-    enum CallbackFlags {
+    public enum CallbackFlags {
         InputUnderflow(0x00000001),
         InputOverflow(0x00000002),
         OutputUnderflow(0x00000004),
@@ -84,7 +84,7 @@ public class Stream {
         }
     };
 
-    enum CallbackResult {
+    public enum CallbackResult {
         Continue(9),   /**< Signal that the stream should continue invoking the callback and processing audio. */
         Complete(1),   /**< Signal that the stream should stop invoking the callback and finish once all output samples have played. */
         Abort(2);       /**< Signal that the stream should stop invoking the callback and finish as soon as possible. */
@@ -96,7 +96,7 @@ public class Stream {
         }
     };
 
-    interface Listener {
+    public interface Listener {
         int onProcess(
                 byte[] input,
                 byte[] output,
@@ -127,7 +127,7 @@ public class Stream {
     public native long getReadAvailable();
     public native long getWriteAvailable();
 
-    static class Info {
+    public static class Info {
         double inputLatency;
         double outputLatency;
         double sampleRate;
