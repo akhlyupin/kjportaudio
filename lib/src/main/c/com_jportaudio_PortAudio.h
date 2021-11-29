@@ -103,6 +103,38 @@ JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getHostApi
 JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDefaultHostApi
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getDeviceCount
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_jportaudio_PortAudio_getDeviceCount
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getDevice
+ * Signature: (I)Lcom/jportaudio/Device;
+ */
+JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDevice
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getDefaultInputDevice
+ * Signature: ()Lcom/jportaudio/Device;
+ */
+JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDefaultInputDevice
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_jportaudio_PortAudio
+ * Method:    getDefaultOutputDevice
+ * Signature: ()Lcom/jportaudio/Device;
+ */
+JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDefaultOutputDevice
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

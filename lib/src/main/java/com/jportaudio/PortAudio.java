@@ -15,7 +15,6 @@ public class PortAudio {
     }
 
     private PortAudio() {
-        update();
     }
 
     public static native String getJPAVersionText();
@@ -40,22 +39,9 @@ public class PortAudio {
     public native HostApi  getDefaultHostApi() throws RuntimeException;
 
     /* Device */
-    /*private Device[] device;
-    public int getDeviceCount() {
-        return device.length;
-    }
-    public Device getDevice(int index) {
-        return device[index];
-    }
-    public Device getDefaultInputDevice() {
-        return null;
-    }
-    public Device getDefaultOutputDevice() {
-        return null;
-    }*/
+    public static native int getDeviceCount() throws RuntimeException;
+    public static native Device getDevice(int index) throws RuntimeException;
+    public static native Device getDefaultInputDevice() throws RuntimeException;;
+    public static native Device getDefaultOutputDevice() throws RuntimeException;;
 
-    /* update hostApi and device objects */
-    public void update() {
-
-    }
 }

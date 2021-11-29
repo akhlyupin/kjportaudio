@@ -121,3 +121,39 @@ Java_com_jportaudio_PortAudio_getDefaultHostApi(JNIEnv * env, jobject o) {
     JPA_CheckError( env, err );
     return NULL;
 }
+
+JNIEXPORT jint JNICALL 
+Java_com_jportaudio_PortAudio_getDeviceCount (JNIEnv * env, jclass c) {
+    PaError err = Pa_GetDeviceCount();
+    return JPA_CheckError( env, err );
+}
+
+
+JNIEXPORT jobject JNICALL 
+Java_com_jportaudio_PortAudio_getDevice(JNIEnv * env, jclass c, jint index) {
+    return getDevice(env, index);
+}
+
+
+JNIEXPORT jobject JNICALL 
+Java_com_jportaudio_PortAudio_getDefaultInputDevice(JNIEnv * env, jclass c) {
+    PaDeviceIndex index = Pa_GetDefaultInputDevice();
+    JPA_CheckError( env, index );
+
+    if (index > 0) {
+        return getDevice(env, index);
+    }
+    return NULL; 
+}
+
+
+JNIEXPORT jobject JNICALL 
+Java_com_jportaudio_PortAudio_getDefaultOutputDevice(JNIEnv * env, jclass c) {
+    PaDeviceIndex index = Pa_GetDefaultOutputDevice();
+    JPA_CheckError( env, index );
+
+    if (index > 0) {
+        return getDevice(env, index);
+    }
+    return NULL; 
+}
