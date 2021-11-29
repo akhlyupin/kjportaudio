@@ -6,6 +6,8 @@
  */
 package com.jportaudio;
 
+import java.util.Objects;
+
 public class Device {
     final int               index;
     private final String    name;
@@ -78,5 +80,25 @@ public class Device {
                 " defSampleRate=" + defaultSampleRate;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Device device = (Device) o;
+        return (index == device.index) &&
+                (hostApiIndex == device.hostApiIndex) &&
+                (maxInputChannels == device.maxInputChannels) &&
+                (maxOutputChannels == device.maxOutputChannels) &&
+                Double.compare(device.defaultLowInputLatency, defaultLowInputLatency) == 0 &&
+                Double.compare(device.defaultLowOutputLatency, defaultLowOutputLatency) == 0 &&
+                Double.compare(device.defaultHighInputLatency, defaultHighInputLatency) == 0 &&
+                Double.compare(device.defaultHighOutputLatency, defaultHighOutputLatency) == 0 &&
+                Double.compare(device.defaultSampleRate, defaultSampleRate) == 0 &&
+                name.equals(device.name);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, name, hostApiIndex, maxInputChannels, maxOutputChannels, defaultLowInputLatency, defaultLowOutputLatency, defaultHighInputLatency, defaultHighOutputLatency, defaultSampleRate);
+    }
 }
