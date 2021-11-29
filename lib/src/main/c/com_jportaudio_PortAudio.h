@@ -41,14 +41,6 @@ JNIEXPORT jstring JNICALL Java_com_jportaudio_PortAudio_getVersionControlRevisio
 
 /*
  * Class:     com_jportaudio_PortAudio
- * Method:    getErrorText
- * Signature: (I)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_jportaudio_PortAudio_getErrorText
-  (JNIEnv *, jclass, jint);
-
-/*
- * Class:     com_jportaudio_PortAudio
  * Method:    init
  * Signature: ()I
  */
@@ -85,7 +77,7 @@ JNIEXPORT void JNICALL Java_com_jportaudio_PortAudio_sleep
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL Java_com_jportaudio_PortAudio_getHostApiCount
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_jportaudio_PortAudio
@@ -93,7 +85,7 @@ JNIEXPORT jint JNICALL Java_com_jportaudio_PortAudio_getHostApiCount
  * Signature: (I)Lcom/jportaudio/HostApi;
  */
 JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getHostApi
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jclass, jint);
 
 /*
  * Class:     com_jportaudio_PortAudio
@@ -101,7 +93,7 @@ JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getHostApi
  * Signature: ()Lcom/jportaudio/HostApi;
  */
 JNIEXPORT jobject JNICALL Java_com_jportaudio_PortAudio_getDefaultHostApi
-  (JNIEnv *, jobject);
+  (JNIEnv *, jclass);
 
 /*
  * Class:     com_jportaudio_PortAudio

@@ -30,11 +30,6 @@ Java_com_jportaudio_PortAudio_getVersionControlRevision(JNIEnv * env, jclass c) 
     return (*env)->NewStringUTF(env, Pa_GetVersionInfo()->versionControlRevision );
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_jportaudio_PortAudio_getErrorText(JNIEnv * env, jclass c, jint errorCode) {
-    return (*env)->NewStringUTF(env, Pa_GetErrorText( errorCode ) );
-}
-
 JNIEXPORT jint JNICALL
 Java_com_jportaudio_PortAudio_init(JNIEnv * env, jclass c) {
     PaError err = Pa_Initialize();
@@ -60,13 +55,13 @@ Java_com_jportaudio_PortAudio_sleep(JNIEnv * env, jclass c, jlong ms) {
 }
 
 JNIEXPORT jint JNICALL
-Java_com_jportaudio_PortAudio_getHostApiCount(JNIEnv * env, jobject o) {
+Java_com_jportaudio_PortAudio_getHostApiCount(JNIEnv * env, jclass c) {
     PaError err = Pa_GetHostApiCount();
     return JPA_CheckError( env, err );
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_jportaudio_PortAudio_getHostApi(JNIEnv * env, jobject o, jint index) {
+Java_com_jportaudio_PortAudio_getHostApi(JNIEnv * env, jclass c, jint index) {
     const PaHostApiInfo * hostApi = Pa_GetHostApiInfo(index);
     if (hostApi == NULL) {
         JNI_ThrowError( env, "Get HostApiInfo error.\n");
@@ -112,10 +107,10 @@ Java_com_jportaudio_PortAudio_getHostApi(JNIEnv * env, jobject o, jint index) {
 }
 
 JNIEXPORT jobject JNICALL 
-Java_com_jportaudio_PortAudio_getDefaultHostApi(JNIEnv * env, jobject o) {
+Java_com_jportaudio_PortAudio_getDefaultHostApi(JNIEnv * env, jclass c) {
     PaError err = Pa_GetDefaultHostApi();
     if (err >= 0) {
-        return Java_com_jportaudio_PortAudio_getHostApi(env, o, err); 
+        return Java_com_jportaudio_PortAudio_getHostApi(env, c, err); 
     }
 
     JPA_CheckError( env, err );

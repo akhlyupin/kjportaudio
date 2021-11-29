@@ -7,8 +7,6 @@
 package com.jportaudio;
 
 public class PortAudio {
-    public static PortAudio instance = new PortAudio();
-
     static {
         System.loadLibrary("portaudio");
         System.loadLibrary("jportaudio");
@@ -23,8 +21,6 @@ public class PortAudio {
     public static native String getVersionText();
     public static native String getVersionControlRevision();
 
-    public static native String getErrorText(int error);
-
     public static native int init() throws RuntimeException;
     public static native int terminate() throws RuntimeException;
 
@@ -34,9 +30,9 @@ public class PortAudio {
     public static native void sleep(long msec);
 
     /* Host Api */
-    public native int      getHostApiCount() throws RuntimeException;
-    public native HostApi  getHostApi(int index) throws RuntimeException;
-    public native HostApi  getDefaultHostApi() throws RuntimeException;
+    public static native int      getHostApiCount() throws RuntimeException;
+    public static native HostApi  getHostApi(int index) throws RuntimeException;
+    public static native HostApi  getDefaultHostApi() throws RuntimeException;
 
     /* Device */
     public static native int getDeviceCount() throws RuntimeException;
