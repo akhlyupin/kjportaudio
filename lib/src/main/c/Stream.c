@@ -12,6 +12,13 @@
 #include <string.h>
 #include <stdlib.h>
 
+typedef struct {
+    jobject listener;
+    unsigned int length;
+} CallbackUserData_t;
+
+static JavaVM * javaVM = NULL;
+
 static void getStreamParam(
     JNIEnv * env, jobject streamParam, PaStreamParameters * paStreamParam) {
 
@@ -78,19 +85,12 @@ Java_com_jportaudio_Stream_isFormatSupported(
     return JPA_CheckError(env, err);
 }
 
-typedef struct {
-    jobject listener;
-    unsigned int length;
-} CallbackUserData_t;
-
-static JavaVM * javaVM = NULL;
-
 static int streamCallback( const void *input, void *output, 
                     unsigned long frameCount,
                     const PaStreamCallbackTimeInfo* timeInfo,
                     PaStreamCallbackFlags statusFlags,
                     void *userData ) {
-
+    
     CallbackUserData_t * cbUserData = (CallbackUserData_t *)userData;
     if (cbUserData->listener == NULL) {
         return paAbort;
@@ -138,6 +138,37 @@ static int streamCallback( const void *input, void *output,
 
     return result;
     
+}
+
+static void streamFinishedCallback( void* userData ) {
+    CallbackUserData_t * cbUserData = (CallbackUserData_t *)userData;
+
+    if (cbUserData->listener) {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_8;
+        args.name = "AudioStreamFinishCallbackThread";
+        args.group = NULL;
+
+        JNIEnv * env = NULL;
+        if ((*javaVM)->AttachCurrentThread(javaVM, (void**)&env, &args) != JNI_OK) {
+            free(cbUserData);
+            JNI_ThrowError( env, "Attach audio finish stream thread error." );
+            return;
+        } 
+        
+        jmethodID onFinishedMethod = JNI_GetObjectMethod(env, cbUserData->listener, "onFinished", "()I");
+        if (onFinishedMethod) {
+            (*env)->CallIntMethod(env, cbUserData->listener, onFinishedMethod);
+            
+        } else {
+            JNI_ThrowError( env, "Cannot find onFinishedMethod." );
+        }
+
+        (*env)->DeleteGlobalRef(env, cbUserData->listener);
+        (*javaVM)->DetachCurrentThread(javaVM);
+    }   
+    
+    free(cbUserData);
 }
 
 static CallbackUserData_t * getUserData(JNIEnv * env, jobject listener, jbyteArray jUserData) {
@@ -209,7 +240,11 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
                                     getUserData(env, listener, jUserData));
 
     JNI_SetLongField(env, o, "nativeStream", (jlong)paStream);
+    JPA_CheckError(env, err);
+    if ((*env)->ExceptionOccurred(env)) return;
 
+    /* set finish callback */
+    err = Pa_SetStreamFinishedCallback( paStream, streamFinishedCallback );
     JPA_CheckError(env, err);
 }
 

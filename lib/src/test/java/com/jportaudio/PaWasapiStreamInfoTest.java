@@ -62,6 +62,7 @@ public class PaWasapiStreamInfoTest {
 
         @Override
         public int onFinished() {
+            System.out.println("Stream: onFinished");
             return 0;
         }
 

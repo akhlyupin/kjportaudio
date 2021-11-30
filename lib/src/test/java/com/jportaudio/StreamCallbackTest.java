@@ -51,6 +51,7 @@ public class StreamCallbackTest {
 
         @Override
         public int onFinished() {
+            System.out.println("Stream: onFinished");
             return 0;
         }
 
