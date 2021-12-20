@@ -105,4 +105,87 @@ public class StreamCallbackTest {
             Assert.fail();
         }
     }
+
+    private byte[] getSinData() {
+        int length = 32768;
+        ByteBuffer bb = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < length; i++) {
+            bb.putFloat(i * 4, (float)Math.sin((float)i / 44));  // ~1000Hz
+        }
+        return bb.array();
+    }
+
+    Stream.Listener writeListener = new Stream.Listener() {
+        @Override
+        public int onProcess(byte[] input,
+                             byte[] output,
+                             long frameCount,
+                             Stream.CallbackTimeInfo timeInfo,
+                             Stream.CallbackFlags statusFlags,
+                             byte[] userData) {
+
+            System.out.println("onProc: frameCount=" + frameCount);
+
+            assert(output != null);
+            assertEquals(32768 << 2, output.length);
+
+            byte[] d = getSinData();
+            for (int i = 0; i < output.length; i++) {
+                output[i] = d[i];
+            }
+
+
+            assert(userData != null);
+            assertEquals(8, userData.length);
+
+            for (int i = 0; i < 8; i++) {
+                assertEquals(i, userData[i]);
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int onFinished() {
+            System.out.println("Stream: onFinished");
+            return 0;
+        }
+    };
+
+    @Test
+    public void testStreamWrite() {
+        try {
+            PortAudio.init();
+            Device outputDevice = PortAudio.getDefaultHostApi().getDefaultOutputDevice();
+            System.out.println(outputDevice.toString());
+
+            Stream.Parameters outputParams = new Stream.Parameters(
+                    outputDevice, 1, SampleFormat.Float32, 0, null);
+            Stream stream = new Stream(null, outputParams, outputDevice.getDefaultSampleRate());
+
+            byte[] userData = new byte[]{0,1,2,3,4,5,6,7};
+            stream.open(32768, Stream.Flags.ClipOff, writeListener, userData);
+            System.out.println("Open stream!");
+
+            assert(stream.isStreamStopped());
+
+            stream.start();
+            System.out.println("Start stream!");
+
+            assert(!stream.isStreamStopped());
+
+            double t = stream.getTime();
+            while (stream.getTime() - t < 2);
+
+            stream.stop();
+            System.out.println("Stop stream!");
+            stream.close();
+            System.out.println("Close stream!");
+
+            PortAudio.terminate();
+        } catch (RuntimeException e) {
+            System.out.println(e);
+            Assert.fail();
+        }
+    }
 }
