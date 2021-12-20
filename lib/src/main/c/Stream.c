@@ -130,9 +130,27 @@ static int streamCallback( const void *input, void *output,
     
     
     //TODO: frameCount need multiply to SampleFormat. now it is fixed *4 for paFloatFormat
+    jbyteArray inputArray = (input) ? JNI_GetJByteArray(env, input, frameCount * 4) : NULL;
+    jbyteArray outputArray = (output) ? (*env)->NewByteArray(env, frameCount * 4) : NULL;
+
     jint result = (*env)->CallIntMethod(
         env, cbUserData->listener, onProcMethod, 
-        JNI_GetJByteArray(env, input, frameCount * 4), NULL, (jlong)frameCount, NULL, NULL, jUserData);
+        inputArray, outputArray, (jlong)frameCount, NULL, NULL, jUserData);
+
+    if (output) {
+        jbyte * jOutput;
+        jsize length;
+        JNI_GetBytes(env, outputArray, &jOutput, &length);
+
+        if (length != frameCount * 4) {
+            (*javaVM)->DetachCurrentThread(javaVM);
+            JNI_ThrowError( env, "Output data length error." );
+            return paAbort;
+        } else {
+            memcpy(output, jOutput, length);
+        }
+    }
+    
 
     (*javaVM)->DetachCurrentThread(javaVM);
 
