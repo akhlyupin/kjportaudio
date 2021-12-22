@@ -12,7 +12,7 @@
 
 JNIEXPORT jstring JNICALL 
 Java_com_jportaudio_PortAudio_getJPAVersionText(JNIEnv * env, jclass c) {
-    return (*env)->NewStringUTF(env, "0.2.0+" );
+    return (*env)->NewStringUTF(env, "0.3.0" );
 }
 
 JNIEXPORT jint JNICALL
