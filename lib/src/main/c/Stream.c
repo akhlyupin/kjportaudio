@@ -15,7 +15,8 @@
 typedef struct {
     jobject listener;
     unsigned int sampleLength;
-    unsigned int length;
+    unsigned int channelCount;
+    unsigned int userDataLength;
 } CallbackUserData_t;
 
 static JavaVM * javaVM = NULL;
@@ -125,12 +126,14 @@ static int streamCallback( const void *input, void *output,
     }
 
     jbyteArray jUserData = NULL;
-    if (cbUserData->length > 0) {
-        jUserData = JNI_GetJByteArray(env, userData + sizeof(CallbackUserData_t), cbUserData->length);
+    if (cbUserData->userDataLength > 0) {
+        jUserData = JNI_GetJByteArray(env, 
+                                        userData + sizeof(CallbackUserData_t), 
+                                        cbUserData->userDataLength);
     }
     
     
-    unsigned long dataLength = frameCount * cbUserData->sampleLength;
+    unsigned long dataLength = frameCount * cbUserData->sampleLength * cbUserData->channelCount;
     jbyteArray inputArray = (input) ? JNI_GetJByteArray(env, input, dataLength) : NULL;
     jbyteArray outputArray = (output) ? (*env)->NewByteArray(env, dataLength) : NULL;
 
@@ -205,8 +208,11 @@ static unsigned int getSampleLength(PaSampleFormat sf) {
     }
 }
 
-static CallbackUserData_t * getUserData(
-    JNIEnv * env, jobject listener, unsigned int sampleLength, jbyteArray jUserData) {
+static CallbackUserData_t * getUserData(JNIEnv * env, 
+                                        jobject listener, 
+                                        unsigned int sampleLength, 
+                                        unsigned int channelCount,
+                                        jbyteArray jUserData) {
 
     if (listener == NULL) return NULL;
 
@@ -219,7 +225,8 @@ static CallbackUserData_t * getUserData(
     CallbackUserData_t * header = (CallbackUserData_t *)cbUserData;
     header->listener = (*env)->NewGlobalRef(env, listener);
     header->sampleLength = sampleLength;
-    header->length = jUserDataLength;
+    header->channelCount = channelCount;
+    header->userDataLength = jUserDataLength;
 
     if (jUserDataLength > 0) {
         memcpy(cbUserData + sizeof(CallbackUserData_t), ud, jUserDataLength);
@@ -249,12 +256,14 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
     const PaStreamParameters * paInputParamPointer = NULL; 
     const PaStreamParameters * paOutputParamPointer = NULL;
     unsigned int sampleLength = 4;
+    unsigned int channelCount = 0;
 
     if (inputParam != NULL) {
         getStreamParam(env, inputParam, &paInputParam);
         paInputParamPointer = &paInputParam;
 
         sampleLength = getSampleLength(paInputParam.sampleFormat); 
+        channelCount = paInputParam.channelCount;
     }
 
     if (outputParam != NULL) {
@@ -262,6 +271,16 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
         paOutputParamPointer = &paOutputParam;
 
         sampleLength = getSampleLength(paOutputParam.sampleFormat); 
+        if (inputParam != NULL) {
+            if (paOutputParam.channelCount != paInputParam.channelCount) {
+                JNI_ThrowError( env, "Input and Output stream channel count are not equals." );
+                return;
+            }
+
+        } else {
+            channelCount = paOutputParam.channelCount;
+        }
+        
     }
 
     /* get sample rate */
@@ -270,6 +289,13 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
     /* get stream flags */
     PaStreamFlags paFlags = JNI_GetIntField(env, flags, "value");
         
+    /* get user data*/
+    CallbackUserData_t * ud = getUserData(env, 
+                                            listener, 
+                                            sampleLength, 
+                                            channelCount, 
+                                            jUserData);
+
     /* open stream */
     PaStream * paStream;
     PaError err = Pa_OpenStream(    &paStream,
@@ -279,7 +305,7 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
                                     framesPerBuffer,
                                     paFlags,
                                     (listener) ? streamCallback : NULL, 
-                                    getUserData(env, listener, sampleLength, jUserData));
+                                    ud);
 
     JNI_SetLongField(env, o, "nativeStream", (jlong)paStream);
     JPA_CheckError(env, err);
