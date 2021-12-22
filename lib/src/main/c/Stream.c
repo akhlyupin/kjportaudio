@@ -41,15 +41,13 @@ static void getStreamParam(
             JNI_GetBytes(env, specificStreamInfoArray, &specificStreamInfo, &specificStreamInfoLength);
             paStreamParam->hostApiSpecificStreamInfo = specificStreamInfo;
 
-            printf("specificStreamInfoArray :\n");
+            /*printf("specificStreamInfoArray :\n");
             for (int i = 0; i < specificStreamInfoLength; i+=4) {
                 jbyte * b = specificStreamInfo;
                 printf("%d %d %d %d\n", b[i], b[i+1], b[i+2], b[i+3]);
             }
-            printf("specificStreamInfoArray END\n");
+            printf("specificStreamInfoArray END\n");*/
 
-        } else {
-            printf("specificStreamInfoArray == NULL\n");
         }
         
     }
