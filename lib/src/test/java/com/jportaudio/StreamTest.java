@@ -59,15 +59,6 @@ public class StreamTest {
         }
     }
 
-    private byte[] getSinData() {
-        int length = 32768 * 2;
-        ByteBuffer bb = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < length; i++) {
-            bb.putFloat(i * 4, (float)Math.sin((float)i / 44));  // ~1000Hz
-        }
-        return bb.array();
-    }
-
     @Test
     public void testBlockingStreamWrite() {
         try {
@@ -94,7 +85,7 @@ public class StreamTest {
 
             assert(!stream.isStreamStopped());
 
-            byte[] data = getSinData();
+            byte[] data = SinData.getData();
             stream.write(data, 65536);
 
 

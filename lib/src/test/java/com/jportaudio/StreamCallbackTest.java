@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class StreamCallbackTest {
 
@@ -106,15 +105,6 @@ public class StreamCallbackTest {
         }
     }
 
-    private byte[] getSinData() {
-        int length = 32768;
-        ByteBuffer bb = ByteBuffer.allocate(length * 4).order(ByteOrder.LITTLE_ENDIAN);
-        for (int i = 0; i < length; i++) {
-            bb.putFloat(i * 4, (float)Math.sin((float)i / 44));  // ~1000Hz
-        }
-        return bb.array();
-    }
-
     Stream.Listener writeListener = new Stream.Listener() {
         @Override
         public int onProcess(byte[] input,
@@ -129,7 +119,7 @@ public class StreamCallbackTest {
             assert(output != null);
             assertEquals(32768 << 2, output.length);
 
-            byte[] d = getSinData();
+            byte[] d = SinData.getData();
             for (int i = 0; i < output.length; i++) {
                 output[i] = d[i];
             }
