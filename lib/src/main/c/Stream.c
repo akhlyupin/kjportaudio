@@ -14,6 +14,7 @@
 
 typedef struct {
     jobject listener;
+    unsigned int sampleLength;
     unsigned int length;
 } CallbackUserData_t;
 
@@ -129,9 +130,9 @@ static int streamCallback( const void *input, void *output,
     }
     
     
-    //TODO: frameCount need multiply to SampleFormat. now it is fixed *4 for paFloatFormat
-    jbyteArray inputArray = (input) ? JNI_GetJByteArray(env, input, frameCount * 4) : NULL;
-    jbyteArray outputArray = (output) ? (*env)->NewByteArray(env, frameCount * 4) : NULL;
+    unsigned long dataLength = frameCount * cbUserData->sampleLength;
+    jbyteArray inputArray = (input) ? JNI_GetJByteArray(env, input, dataLength) : NULL;
+    jbyteArray outputArray = (output) ? (*env)->NewByteArray(env, dataLength) : NULL;
 
     jint result = (*env)->CallIntMethod(
         env, cbUserData->listener, onProcMethod, 
@@ -142,7 +143,7 @@ static int streamCallback( const void *input, void *output,
         jsize length;
         JNI_GetBytes(env, outputArray, &jOutput, &length);
 
-        if (length != frameCount * 4) {
+        if (length != dataLength) {
             (*javaVM)->DetachCurrentThread(javaVM);
             JNI_ThrowError( env, "Output data length error." );
             return paAbort;
@@ -189,7 +190,24 @@ static void streamFinishedCallback( void* userData ) {
     free(cbUserData);
 }
 
-static CallbackUserData_t * getUserData(JNIEnv * env, jobject listener, jbyteArray jUserData) {
+static unsigned int getSampleLength(PaSampleFormat sf) {
+    switch(sf) {
+        case paFloat32: 
+            return 4;
+        case paInt32:
+            return 4;
+        case paInt24:
+            return 3;
+        case paInt16:
+            return 2;
+        default:
+            return 1;
+    }
+}
+
+static CallbackUserData_t * getUserData(
+    JNIEnv * env, jobject listener, unsigned int sampleLength, jbyteArray jUserData) {
+
     if (listener == NULL) return NULL;
 
     jsize jUserDataLength = 0;
@@ -200,6 +218,7 @@ static CallbackUserData_t * getUserData(JNIEnv * env, jobject listener, jbyteArr
     uint8_t * cbUserData = malloc(sizeof(CallbackUserData_t) + jUserDataLength);
     CallbackUserData_t * header = (CallbackUserData_t *)cbUserData;
     header->listener = (*env)->NewGlobalRef(env, listener);
+    header->sampleLength = sampleLength;
     header->length = jUserDataLength;
 
     if (jUserDataLength > 0) {
@@ -229,15 +248,20 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
     PaStreamParameters paInputParam, paOutputParam;
     const PaStreamParameters * paInputParamPointer = NULL; 
     const PaStreamParameters * paOutputParamPointer = NULL;
+    unsigned int sampleLength = 4;
 
     if (inputParam != NULL) {
         getStreamParam(env, inputParam, &paInputParam);
         paInputParamPointer = &paInputParam;
+
+        sampleLength = getSampleLength(paInputParam.sampleFormat); 
     }
 
     if (outputParam != NULL) {
         getStreamParam(env, outputParam, &paOutputParam);
         paOutputParamPointer = &paOutputParam;
+
+        sampleLength = getSampleLength(paOutputParam.sampleFormat); 
     }
 
     /* get sample rate */
@@ -255,7 +279,7 @@ Java_com_jportaudio_Stream_open(JNIEnv * env, jobject o,
                                     framesPerBuffer,
                                     paFlags,
                                     (listener) ? streamCallback : NULL, 
-                                    getUserData(env, listener, jUserData));
+                                    getUserData(env, listener, sampleLength, jUserData));
 
     JNI_SetLongField(env, o, "nativeStream", (jlong)paStream);
     JPA_CheckError(env, err);
